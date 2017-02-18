@@ -3,17 +3,17 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: In each unit (row, column, or square) we look for any indeterminate boxes that have the same possible values as another indeterminate box within the same unit. If we find such a pair of boxes, we remove the values they contain from any other indeterminate boxes within their unit.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: Any box which lies on these diagonals will be considered as having an additional unit: the diagonal they're on. Elimination, only choice, etc. will then be applied in such a way that these diagonals are additional units to consider when finding possibilities and making selections for boxes on the major diagonals.
 
 ### Install
 
 This project requires **Python 3**.
 
-We recommend students install [Anaconda](https://www.continuum.io/downloads), a pre-packaged Python distribution that contains all of the necessary libraries and software for this project. 
+We recommend students install [Anaconda](https://www.continuum.io/downloads), a pre-packaged Python distribution that contains all of the necessary libraries and software for this project.
 Please try using the environment we provided in the Anaconda lesson of the Nanodegree.
 
 ##### Optional: Pygame
