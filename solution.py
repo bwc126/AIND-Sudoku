@@ -14,6 +14,10 @@ unitlist = row_units + column_units + square_units + diagonal_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
+unitlist_2 = row_units + column_units + square_units
+units_2 = dict((s, [u for u in unitlist_2 if s in u]) for s in boxes)
+peers_2 = dict((s, set(sum(units_2[s],[]))-set([s])) for s in boxes)
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -34,7 +38,28 @@ def naked_twins(values):
     """
 
     # Find all instances of naked twins
+    # For each box with more than one value
+    unsolved_values = [box for box in values.keys() if len(values[box]) == 2]
+    for box in unsolved_values:
+        val_1 = values[box]
+        for peer in peers[box]:
+            val_2 = values[peer]
+            # If there's another box in this unit with the same value
+            if val_1 == val_2:
+                # unsolved_values.remove(box)
+                # unsolved_values.remove(peer)
+                print (val_1, val_2)
+                removal_list = [peer2 for peer2 in peers[box] if peer2 != peer and len(values[peer2]) > 1]
+                removal_list_2 = [peer2 for peer2 in peers[peer] if peer2 != box and len(values[peer2]) > 1]
 
+                # removal_list.extend(removal_list_2)
+                for box2 in removal_list:
+                    # We have our twins, and we can remove their values from other boxes in the same unit.
+                    if box2 in removal_list_2:
+                        for val in val_1:
+                            print(val, box2)
+                            values = assign_value(values, box2, values[box2].replace(val, ''))
+    return values
     # Eliminate the naked twins as possibilities for their peers
 
 
@@ -67,15 +92,16 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
-    # Our width for each box should only be as small as our longest value
-    width = 1+max(len(values[s]) for s in boxes)
-    # Using the width found above, we build divider strings to separate square units
-    line = '+'.join(['-'*(width*3)]*3)
-    for r in rows:
-        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
-                      for c in cols))
-        if r in 'CF': print(line)
-    print
+    if values:
+        # Our width for each box should only be as small as our longest value
+        width = 1+max(len(values[s]) for s in boxes)
+        # Using the width found above, we build divider strings to separate square units
+        line = '+'.join(['-'*(width*3)]*3)
+        for r in rows:
+            print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
+                          for c in cols))
+            if r in 'CF': print(line)
+        print
 
 def eliminate(values):
     # Get each known single value in the puzzle
@@ -104,7 +130,7 @@ def reduce_puzzle(values):
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
         values = eliminate(values)
         values = only_choice(values)
-        # values = diagonal(values)
+        values = naked_twins(values)
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         stalled = solved_values_before == solved_values_after
         if len([box for box in values.keys() if len(values[box]) == 0]):
@@ -137,6 +163,9 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    values = grid_values(grid)
+    values = search(values)
+    return values
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
