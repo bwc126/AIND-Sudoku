@@ -14,15 +14,12 @@ unitlist = row_units + column_units + square_units + diagonal_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
-unitlist_2 = row_units + column_units + square_units
-units_2 = dict((s, [u for u in unitlist_2 if s in u]) for s in boxes)
-peers_2 = dict((s, set(sum(units_2[s],[]))-set([s])) for s in boxes)
-
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
     Assigns a value to a given box. If it updates the board record it.
     """
+    # This uses a global list to keep track of all value assignments we make, which is later used to visualize our progress in solving the puzzle.
     values[box] = value
     if len(value) == 1:
         assignments.append(values.copy())
@@ -38,26 +35,22 @@ def naked_twins(values):
     """
 
     # Find all instances of naked twins
-    # For each box with more than one value
+    # We can only find twins or boxes to remove values from among boxes with more than one value
     unsolved_values = [box for box in values.keys() if len(values[box]) == 2]
     for box in unsolved_values:
         val_1 = values[box]
         for peer in peers[box]:
             val_2 = values[peer]
-            # If there's another box in this unit with the same value
+            # If there's another box in this unit with the same value, we've found a twin
             if val_1 == val_2:
-                # unsolved_values.remove(box)
-                # unsolved_values.remove(peer)
-                print (val_1, val_2)
+                # We need to find the peers of each of our twins
                 removal_list = [peer2 for peer2 in peers[box] if peer2 != peer and len(values[peer2]) > 1]
                 removal_list_2 = [peer2 for peer2 in peers[peer] if peer2 != box and len(values[peer2]) > 1]
 
-                # removal_list.extend(removal_list_2)
+                # We have our twins, and we can remove their values from other boxes in the same unit as both our twins.
                 for box2 in removal_list:
-                    # We have our twins, and we can remove their values from other boxes in the same unit.
                     if box2 in removal_list_2:
                         for val in val_1:
-                            print(val, box2)
                             values = assign_value(values, box2, values[box2].replace(val, ''))
     return values
     # Eliminate the naked twins as possibilities for their peers
@@ -123,16 +116,17 @@ def only_choice(values):
     return values
 
 def reduce_puzzle(values):
-
-    solved_values = [box for box in values.keys() if len(values[box]) == 1]
+    # If we don't seem to make progress, we'll need to let the process that called this function know
     stalled = False
     while not stalled:
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+        # Call each of our solver techniques, in the order they're most effective
         values = eliminate(values)
         values = only_choice(values)
         values = naked_twins(values)
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         stalled = solved_values_before == solved_values_after
+        # Handle a certain class of unsolvables
         if len([box for box in values.keys() if len(values[box]) == 0]):
             return False
     return values

@@ -3,11 +3,11 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: In each unit (row, column, or square) we look for any indeterminate boxes that have the same possible values as another indeterminate box within the same unit. If we find such a pair of boxes, we remove the values they contain from any other indeterminate boxes within their unit.
+A: In each unit (row, column, square, or diagonal) we look for any indeterminate boxes with two possible values that have the same possible values as another indeterminate box within the same unit. If we find such a pair of boxes, we remove the values they contain from any other indeterminate boxes within the units they are both part of.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: Any box which lies on these diagonals will be considered as having an additional unit: the diagonal they're on. Elimination, only choice, etc. will then be applied in such a way that these diagonals are additional units to consider when finding possibilities and making selections for boxes on the major diagonals.
+A: Any box which lies on the primary diagonals will be considered as having an additional unit: the diagonal they're on. For the boxes on the diagonal, the diagonal is simply another unit to consider when finding possibilities and making selections for elimaination, only choice, naked twins, etc.  
 
 ### Install
 
